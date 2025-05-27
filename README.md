@@ -202,3 +202,4 @@ Must be one of the following:
 
 This project provides a robust, scalable, and maintainable backend platform suitable for managing music-related data.
 # Emobeat-backend
+# EMOBEAT-backend
