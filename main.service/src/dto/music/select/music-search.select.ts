@@ -1,7 +1,6 @@
 export const MusicSearchSelect = {
   id: true,
   name: true,
-  approved: true,
   coverPhoto: true,
   resourceLink: true,
   listenCount: true,

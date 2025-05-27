@@ -11,9 +11,9 @@ export class ListnerGetMeRes {
 
   gender!: string;
 
-  points!: number;
+  birthdate!: Date;
 
-  premiumExpiredAt?: Date;
+  nationality!: string;
 
   favoriteLists!: FavoriteList[];
 
