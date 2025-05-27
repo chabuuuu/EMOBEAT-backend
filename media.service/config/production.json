@@ -6,7 +6,7 @@
     "port": 4000,
     "host": "sonata.io.vn",
     "api_version": "/api/v1",
-    "url": "https://api.sonata.io.vn/media-service/api/v1"
+    "url": "https://api-emobeat.sonata.io.vn/media-service/api/v1"
   },
   "cors": {
     "origin": "*",
