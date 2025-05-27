@@ -1,9 +1,9 @@
 name: "[CD Pipeline] for EMOBEAT Backend - Media Service"
 
 env:
-  DEPLOY_FOLDER: /root/da2_project/backend/source/media.service
-  PROJECT_FOLDER: /root/da2_project/backend/source
-  ENV_FILE_PATH: /root/da2_project/backend/env_file/media.service/.env
+  DEPLOY_FOLDER: /home/project/da2_project/backend/source/media.service
+  PROJECT_FOLDER: /home/project/da2_project/backend/source
+  ENV_FILE_PATH: /home/project/da2_project/backend/env_file/media.service/.env
 
 on:
   push:

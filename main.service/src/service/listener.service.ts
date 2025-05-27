@@ -1,4 +1,3 @@
-import { PREMIUM_EXCHANGE_RULE } from '@/constants/premium-exchange-rule.constants';
 import { TIME_CONSTANTS } from '@/constants/time.constants';
 import { ListnerRegisterByEmailCache } from '@/dto/listener/cache/listner-register-by-email.cache';
 import { ListnerLoginReq } from '@/dto/listener/request/listener-login.req';
@@ -13,7 +12,6 @@ import { SearchDataDto } from '@/dto/search/search-data.dto';
 import { RedisSchemaEnum } from '@/enums/redis-schema.enum';
 import { RoleCodeEnum } from '@/enums/role-code.enum';
 import { ListenerActiveEmailException } from '@/exceptions/listener/listener-active-email.exception';
-import { ListenerExchangePointException } from '@/exceptions/listener/listener-exchange-point.exception';
 import { ListenerGetByIdException } from '@/exceptions/listener/listener-get-by-id.exception';
 import { ListenerLoginException } from '@/exceptions/listener/listener-login.exception';
 import { ListenerRegisterException } from '@/exceptions/listener/listener-register.exception';
@@ -29,7 +27,6 @@ import redis from '@/utils/redis/redis.util';
 import { SearchUtil } from '@/utils/search/search.util';
 import { generateAccessToken } from '@/utils/security/generate-access-token.util';
 import bcrypt from 'bcrypt';
-import c from 'config';
 import { inject, injectable } from 'inversify';
 import validator from 'validator';
 
@@ -40,68 +37,6 @@ export class ListenerService extends BaseCrudService<Listener> implements IListe
   constructor(@inject('ListenerRepository') listenerRepository: IListenerRepository<Listener>) {
     super(listenerRepository);
     this.listenerRepository = listenerRepository;
-  }
-
-  async exchangePremium(listenerId: number): Promise<void> {
-    const listener = await this.listenerRepository.findOne({
-      filter: {
-        id: listenerId
-      }
-    });
-
-    if (!listener) {
-      throw new DefinedError(ListenerExchangePointException.LISTENER_EXCHANGE_POINT_NotFound);
-    }
-
-    // Check if listener has enough points
-    if (listener.points < PREMIUM_EXCHANGE_RULE.points) {
-      throw new DefinedError(ListenerExchangePointException.LISTENER_EXCHANGE_POINT_NotEnoughPoints);
-    }
-
-    // Calculate premiumExpiredAt:
-
-    // If currently have premium: premiumExpiredAt + PREMIUM_EXCHANGE_RULE.duration (days)
-    if (listener.premiumExpiredAt) {
-      // If listener already has premium, extend the premium duration
-      const currentPremiumExpiredAt = new Date(listener.premiumExpiredAt);
-      currentPremiumExpiredAt.setDate(currentPremiumExpiredAt.getDate() + PREMIUM_EXCHANGE_RULE.duration);
-      listener.premiumExpiredAt = currentPremiumExpiredAt;
-    } else {
-      // If currently no have premium: today + PREMIUM_EXCHANGE_RULE.duration (days)
-      listener.premiumExpiredAt = new Date(Date.now() + PREMIUM_EXCHANGE_RULE.duration * TIME_CONSTANTS.DAY);
-    }
-
-    // Update listener's points and premiumExpiredAt
-    await this.listenerRepository.findOneAndUpdate({
-      filter: {
-        id: listenerId
-      },
-      updateData: {
-        points: listener.points - PREMIUM_EXCHANGE_RULE.points,
-        premiumExpiredAt: listener.premiumExpiredAt
-      }
-    });
-  }
-
-  async checkIsPremium(listenerId: number): Promise<boolean> {
-    const listener = await this.listenerRepository.findOne({
-      filter: {
-        id: listenerId
-      },
-      select: {
-        premiumExpiredAt: true
-      }
-    });
-    if (!listener) {
-      return false;
-    }
-
-    // Check if premiumExpiredAt is not null and greater than current time
-    if (listener.premiumExpiredAt && listener.premiumExpiredAt > new Date()) {
-      return true;
-    }
-
-    return false;
   }
 
   async updateById(id: number, data: ListenerUpdateReq): Promise<void> {
@@ -247,11 +182,11 @@ export class ListenerService extends BaseCrudService<Listener> implements IListe
 
     //Valid phone number or email
     sendEmail({
-      from: { name: 'Sonata - Nền tảng chia sẻ nhạc cổ điển hàng đầu' },
+      from: { name: 'EMOBEAT - Nền tảng nhạc theo cảm xúc đầu tiên trên thế giới' },
       to: {
         emailAddress: [listenerRegisterReq.email]
       },
-      subject: 'Xác thực tài khoản Sonata',
+      subject: 'Xác thực tài khoản EMOBEAT',
       text: `Mã xác thực của bạn là: ${otp}`
     });
 
@@ -316,11 +251,11 @@ export class ListenerService extends BaseCrudService<Listener> implements IListe
       fullname: listener.fullname,
       gender: listener.gender,
       email: listener.email,
-      points: listener.points,
-      premiumExpiredAt: listener.premiumExpiredAt,
       createAt: listener.createAt,
       updateAt: listener.updateAt,
-      favoriteLists: listener.favoriteLists
+      favoriteLists: listener.favoriteLists,
+      nationality: listener.nationality,
+      birthdate: listener.birthdate
     };
   }
 }

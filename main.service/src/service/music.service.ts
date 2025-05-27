@@ -61,8 +61,6 @@ export class MusicService extends BaseCrudService<Music> implements IMusicServic
   async quickSearch(searchData: SearchDataDto): Promise<PagingResponseDto<MusicQuickSearchRes>> {
     const { where, order, paging } = SearchUtil.getWhereCondition(searchData);
 
-    where.approved = true;
-
     const musics = await this.musicRepository.findMany({
       filter: where,
       order: order,
@@ -297,18 +295,7 @@ export class MusicService extends BaseCrudService<Music> implements IMusicServic
       filter: {
         id: id
       },
-      relations: [
-        'approvedBy',
-        'uploadedBy',
-        'albums',
-        'quizzes',
-        'genres',
-        'instruments',
-        'periods',
-        'categories',
-        'artists',
-        'composers'
-      ]
+      relations: ['albums', 'genres', 'instruments', 'periods', 'categories', 'artists', 'composers']
     });
 
     if (!musicToUpdate) {
@@ -328,18 +315,7 @@ export class MusicService extends BaseCrudService<Music> implements IMusicServic
       filter: {
         id: id
       },
-      relations: [
-        'approvedBy',
-        'uploadedBy',
-        'albums',
-        'quizzes',
-        'genres',
-        'instruments',
-        'periods',
-        'categories',
-        'artists',
-        'composers'
-      ],
+      relations: ['albums', 'genres', 'instruments', 'periods', 'categories', 'artists', 'composers'],
       select: {
         id: true,
         name: true,

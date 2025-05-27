@@ -15,6 +15,12 @@ export class ListenerResgisterReq {
   password!: string;
 
   @IsNotEmpty()
+  birthdate!: Date;
+
+  @IsNotEmpty()
+  nationality!: string;
+
+  @IsNotEmpty()
   @MaxLength(50)
   fullname!: string;
 
