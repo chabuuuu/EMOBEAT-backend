@@ -24,14 +24,11 @@ export class Listener extends BaseModel {
   @Column({ name: 'gender', type: 'varchar', nullable: true, length: 10 })
   gender!: string;
 
-  @Column({ length: 50, nullable: true })
-  nationality?: string;
+  @Column({ length: 50, nullable: false })
+  nationality!: string;
 
-  @Column({ name: 'points', type: 'int', default: 0 })
-  points!: number;
-
-  @Column({ name: 'premium_expired_at', type: 'timestamp', nullable: true })
-  premiumExpiredAt?: Date;
+  @Column()
+  birthdate!: Date;
 
   @OneToMany(() => FavoriteList, (favoriteList) => favoriteList.listener, {
     cascade: true

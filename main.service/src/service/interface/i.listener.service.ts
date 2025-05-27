@@ -54,16 +54,4 @@ export interface IListenerService<T extends BaseModelType> extends IBaseCrudServ
    * @param otp
    */
   activateEmail(email: string, otp: string): Promise<void>;
-
-  /**
-   * Check if listener is premium
-   * @param listenerId
-   */
-  checkIsPremium(listenerId: number): Promise<boolean>;
-
-  /**
-   *  * Exchange premium for listener
-   * @param listenerId
-   */
-  exchangePremium(listenerId: number): Promise<void>;
 }

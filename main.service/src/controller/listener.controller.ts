@@ -1,12 +1,10 @@
 import { IBaseCrudController } from '@/controller/interfaces/i.base-curd.controller';
 import { SearchDataDto } from '@/dto/search/search-data.dto';
-import { RoleCodeEnum } from '@/enums/role-code.enum';
 import { Listener } from '@/models/listener.model';
 import { IListenerService } from '@/service/interface/i.listener.service';
 import { ITYPES } from '@/types/interface.types';
 import { getCurrentLoggedUser } from '@/utils/get-current-logged-user.util';
 import { getSearchData } from '@/utils/search/get-search-data.util';
-import { SecurityRoleUtil } from '@/utils/security/security-role.util';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 
@@ -141,38 +139,6 @@ export class ListenerController {
       const result = await this.listenerService.updateById(id, req.body);
 
       res.send_ok('Listener updated successfully', result);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /**
-   * * GET /listener/check-is-premium
-   */
-  async checkIsPremium(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const listenerId = parseInt(req.params.listenerId as string);
-
-      const result = await this.listenerService.checkIsPremium(listenerId);
-
-      res.send_ok('Check is premium successfully', {
-        isPremium: result
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /**
-   * * POST /listener/exchange-premium
-   */
-  async exchangePremium(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const user = await getCurrentLoggedUser(req);
-
-      const result = await this.listenerService.exchangePremium(user.id);
-
-      res.send_ok('Exchange premium successfully', result);
     } catch (error) {
       next(error);
     }

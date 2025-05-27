@@ -25,15 +25,11 @@ listenerRouter
 
   .get('/activate/email', listenerController.activateEmail.bind(listenerController).bind(listenerController))
 
-  .post('/exchange-premium', authenticateJWT, listenerController.exchangePremium.bind(listenerController))
-
   .post('/register', classValidate(ListenerResgisterReq), listenerController.register.bind(listenerController))
 
   .post('/login', classValidate(ListnerLoginReq), listenerController.login.bind(listenerController))
 
   .get('/me', authenticateJWT, listenerController.getMe.bind(listenerController))
-
-  .get('/check-is-premium/:listenerId', listenerController.checkIsPremium.bind(listenerController))
 
   .get('/:id', authenticateJWT, checkRole([RoleCodeEnum.ADMIN]), listenerController.getById.bind(listenerController));
 
