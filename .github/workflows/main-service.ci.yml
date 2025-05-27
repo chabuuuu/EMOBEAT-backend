@@ -1,0 +1,47 @@
+name: "[CI Pipeline] for EMOBEAT Backend - Main Service"
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - release
+    paths:
+      - "main.service/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env: # Thiết lập biến môi trường
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      LOGIN_SECRET: ${{ secrets.LOGIN_SECRET }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "21.6.2"
+
+      - name: Install dependencies
+        run: |
+          cd ./main.service 
+          npm install
+
+      - name: Run tests
+        run: |
+          cd ./main.service 
+          npm run test
+
+      - name: Test results
+        if: failure()
+        run: echo "Tests failed, cannot merge!"

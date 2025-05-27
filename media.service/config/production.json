@@ -1,0 +1,33 @@
+{
+  "request_limit": {
+    "limit": "100kb"
+  },
+  "server": {
+    "port": 4000,
+    "host": "sonata.io.vn",
+    "api_version": "/api/v1",
+    "url": "https://api.sonata.io.vn/media-service/api/v1"
+  },
+  "cors": {
+    "origin": "*",
+    "methods": ["GET", "POST", "PUT", "DELETE", "UPDATE"],
+    "allowedHeaders": [
+      "X-Requested-With",
+      "X-HTTP-Method-Override",
+      "Content-Type",
+      "Accept",
+      "Observe",
+      "Authorization"
+    ]
+  },
+  "helmet": {
+    "enable": true
+  },
+  "enviroment": "production",
+  "swagger": {
+    "enable": false
+  },
+  "database": {
+    "sync": false
+  }
+}

@@ -1,0 +1,1 @@
+export const ARTIST_ROLES = ['SINGER', 'BAND', 'COMPOSER', 'MAESTRO', 'CONCERT_MASTER', 'SOLOIST'] as const;

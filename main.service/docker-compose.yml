@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  emobeat_backend_8520:
+    container_name: emobeat_backend_8520
+    image: haphuthinh/emobeat-backend:${IMAGE_VERSION}
+    restart: unless-stopped
+    ports:
+      - '8520:4000'
+    env_file:
+      - .env
+    networks:
+      - emobeat-backend-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 2G
+    healthcheck:
+      test: ['CMD', 'curl', '-fs', 'http://127.0.0.1:4000/api/v1/health']
+      interval: 90s # Kiểm tra mỗi 30 giây
+      timeout: 10s # Timeout sau 10 giây
+      retries: 3 # Thử lại 3 lần trước khi đánh dấu là unhealthy
+      start_period: 10s # Chờ 10 giây trước khi bắt đầu kiểm tra
+
+  emobeat_backend_8521:
+    container_name: emobeat_backend_8521
+    image: haphuthinh/emobeat-backend:${IMAGE_VERSION}
+    restart: unless-stopped
+    ports:
+      - '8521:4000'
+    env_file:
+      - .env
+    networks:
+      - emobeat-backend-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 2G
+    healthcheck:
+      test: ['CMD', 'curl', '-fs', 'http://127.0.0.1:4000/api/v1/health']
+      interval: 90s # Kiểm tra mỗi 30 giây
+      timeout: 10s # Timeout sau 10 giây
+      retries: 3 # Thử lại 3 lần trước khi đánh dấu là unhealthy
+      start_period: 10s # Chờ 10 giây trước khi bắt đầu kiểm tra
+
+networks:
+  emobeat-backend-network:
+    driver: bridge

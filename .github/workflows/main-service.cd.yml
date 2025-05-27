@@ -1,0 +1,131 @@
+name: "[CD Pipeline] for EMOBEAT Backend - Main Service"
+
+env:
+  DEPLOY_FOLDER: /root/da2_project/backend/source/main.service
+  ENV_FILE_PATH: /root/da2_project/backend/env_file/main.service/.env
+  DOCKER_COMPSE_PATH: ./docker-compose.yml
+  IMAGE_NAME: haphuthinh/emobeat-backend:${{ github.ref_name }}-${{ github.sha }}
+  FIRST_PORT: 8520
+  SECOND_PORT: 8521
+  CONTAINER_NAME_WITHOUT_PORT: emobeat_backend
+  PROJECT_FOLDER: /root/da2_project/backend/source
+
+on:
+  push:
+    branches:
+      - release
+    paths:
+      - "main.service/**"
+      - ".github/workflows/**"
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t $IMAGE_NAME ./main.service
+
+      - name: Push Docker image to Docker Hub
+        run: docker push $IMAGE_NAME
+
+      - name: Clean old docker compose script and old env file
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          script: |
+            sudo rm -rf ${{ env.DEPLOY_FOLDER }}/*
+
+      - name: Copy new docker compose script to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          source: "./main.service/docker-compose.yml"
+          target: ${{ env.PROJECT_FOLDER }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_publish
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          script: |
+            cp ${{ env.ENV_FILE_PATH }} ${{ env.DEPLOY_FOLDER }}
+            cd ${{ env.DEPLOY_FOLDER }}
+
+            echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+            ACTIVE_PORT=$(sudo docker ps --format '{{.Ports}}' | grep -oE '${{ env.FIRST_PORT }}|${{ env.SECOND_PORT }}' | head -n1)
+
+            if [ "$ACTIVE_PORT" = "${{ env.FIRST_PORT }}" ]; then
+              NEW_PORT=${{ env.SECOND_PORT }}
+            else
+              NEW_PORT=${{ env.FIRST_PORT }}
+            fi
+
+            echo "Deploying new container on port $NEW_PORT..."
+
+            CONTAINER_NAME="${{ env.CONTAINER_NAME_WITHOUT_PORT }}_$NEW_PORT"
+
+            if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
+                sudo docker compose -f ${{ env.DOCKER_COMPSE_PATH }} down $CONTAINER_NAME
+            fi
+
+            echo "Waiting for new container: $CONTAINER_NAME to pull..."
+
+            sudo IMAGE_VERSION=${{ github.ref_name }}-${{ github.sha }} docker compose -f ${{ env.DOCKER_COMPSE_PATH }} pull $CONTAINER_NAME
+
+            echo "Start new container: $CONTAINER_NAME..."
+
+            sudo IMAGE_VERSION=${{ github.ref_name }}-${{ github.sha }} docker compose -f ${{ env.DOCKER_COMPSE_PATH }} up -d $CONTAINER_NAME
+
+            echo "Waiting for new container to start..."
+
+            for i in {1..90}; do
+              if curl -fs http://127.0.0.1:$NEW_PORT/api/v1/health; then
+                echo "New container is ready!"
+                break
+              fi
+              echo "Still waiting for container..."
+              sleep 2
+            done
+
+            if ! curl -fs http://127.0.0.1:$NEW_PORT/api/v1/health; then
+              echo "Deployment failed: New container is not responding."
+              sudo IMAGE_VERSION=${{ github.ref_name }}-${{ github.sha }} docker compose -f ${{ env.DOCKER_COMPSE_PATH }} down ${{ env.CONTAINER_NAME_WITHOUT_PORT }}_$NEW_PORT
+
+              exit 1
+            fi
+
+            echo "Reloading Nginx..."
+            sudo systemctl reload nginx
+
+            if [ "$ACTIVE_PORT" = "${{ env.FIRST_PORT }}" ]; then
+              echo "Stopping old container: ${{ env.CONTAINER_NAME_WITHOUT_PORT }}_${{ env.FIRST_PORT }}"
+              sudo IMAGE_VERSION=${{ github.ref_name }}-${{ github.sha }} docker compose -f ${{ env.DOCKER_COMPSE_PATH }} down ${{ env.CONTAINER_NAME_WITHOUT_PORT }}_${{ env.FIRST_PORT }}
+            else
+              echo "Stopping old container: ${{ env.CONTAINER_NAME_WITHOUT_PORT }}_${{ env.SECOND_PORT }}"
+              sudo IMAGE_VERSION=${{ github.ref_name }}-${{ github.sha }} docker compose -f ${{ env.DOCKER_COMPSE_PATH }} down ${{ env.CONTAINER_NAME_WITHOUT_PORT }}_${{ env.SECOND_PORT }}
+            fi
+
+            echo "Deployment complete! New version running on port $NEW_PORT."
