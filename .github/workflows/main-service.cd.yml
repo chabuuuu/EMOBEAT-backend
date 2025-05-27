@@ -1,14 +1,14 @@
 name: "[CD Pipeline] for EMOBEAT Backend - Main Service"
 
 env:
-  DEPLOY_FOLDER: /root/da2_project/backend/source/main.service
-  ENV_FILE_PATH: /root/da2_project/backend/env_file/main.service/.env
+  DEPLOY_FOLDER: /home/project/da2_project/backend/source/main.service
+  ENV_FILE_PATH: /home/project/da2_project/backend/env_file/main.service/.env
   DOCKER_COMPSE_PATH: ./docker-compose.yml
   IMAGE_NAME: haphuthinh/emobeat-backend:${{ github.ref_name }}-${{ github.sha }}
   FIRST_PORT: 8520
   SECOND_PORT: 8521
   CONTAINER_NAME_WITHOUT_PORT: emobeat_backend
-  PROJECT_FOLDER: /root/da2_project/backend/source
+  PROJECT_FOLDER: /home/project/da2_project/backend/source
 
 on:
   push:
