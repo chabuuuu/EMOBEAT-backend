@@ -1,9 +1,11 @@
 import { EmotionCollectReq } from '@/dto/emotion_collect/request/emotion_collect.req';
 import { EventEmotionCollectEnum } from '@/enums/event-emotion-collect.enum';
+import { RedisSchemaEnum } from '@/enums/redis-schema.enum';
 import { EmotionCollect } from '@/models/emotion_collect.model';
 import { IEmotionCollectRepository } from '@/repository/interface/i.emotion_collect.repository';
 import { BaseCrudService } from '@/service/base/base.service';
 import { IEmotionCollectService } from '@/service/interface/i.emotion_collect.service';
+import redis from '@/utils/redis/redis.util';
 import { inject, injectable } from 'inversify';
 
 @injectable()
@@ -80,6 +82,15 @@ export class EmotionCollectService
       case EventEmotionCollectEnum.listen_through:
         score = this.PLAY_FULL_SCORE;
         break;
+      case EventEmotionCollectEnum.cron_collect:
+        // For cron collect, we update the emotion of the user to redis
+        redis.set(
+          `${RedisSchemaEnum.emobeat_user_emotions}:${emotionCollect.userId}`,
+          emotionCollect.emotion,
+          'EX',
+          60 * 60 * 24
+        ); // 1 day
+        return; // No score to collect for cron collect
 
       default:
         break;
