@@ -8,4 +8,6 @@ export interface IMusicRepository<T> extends IBaseRepository<T> {
   findApprovedMusicsByArtistId(artistId: number): Promise<Music[]>;
   findApprovedMusicsComposedByArtistId(artistId: number): Promise<Music[]>;
   findMusicToAddToQueue(musicId: number): Promise<Music | null>;
+    findManyByIds(musicIds: number[]): Promise<T[]>;
+
 }

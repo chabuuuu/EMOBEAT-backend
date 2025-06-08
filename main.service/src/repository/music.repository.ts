@@ -4,11 +4,20 @@ import { IMusicRepository } from '@/repository/interface/i.music.repository';
 import { ITYPES } from '@/types/interface.types';
 import { inject } from 'inversify';
 import 'reflect-metadata';
-import { DataSource, IsNull } from 'typeorm';
+import { DataSource, In, IsNull } from 'typeorm';
 
 export class MusicRepository extends BaseRepository<Music> implements IMusicRepository<Music> {
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(Music));
+  }
+
+  async findManyByIds(musicIds: number[]): Promise<Music[]> {
+    return await this.ormRepository.find({
+      where: {
+        id: In(musicIds),
+        deleteAt: IsNull()
+      }
+    });
   }
 
   async findMusicToAddToQueue(musicId: number): Promise<Music | null> {

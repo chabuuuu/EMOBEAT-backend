@@ -111,12 +111,28 @@ export class StreamQueueService implements IStreamQueueService {
     const queueKey = this.getQueueKey(listenerId);
     const music = await this.musicRepository.findMusicToAddToQueue(musicId);
 
+    if (!music) {
+      throw new Error('Music not found or not approved');
+    }
+
     await redis.rpush(queueKey, JSON.stringify({ music: music }));
     await redis.expire(queueKey, 60 * 60 * 3); // 3h
 
     const currentQueue = await this.getQueue(listenerId);
 
-    const currentIndex = currentQueue.length - 1;
+    let currentIndex = 0;
+
+    if (currentQueue.length <= 1) {
+      currentIndex = 0;
+    } else {
+      // Find the index of the current music in the queue
+      for (let i = 0; i < currentQueue.length; i++) {
+        if (currentQueue[i].music.id === musicId) {
+          currentIndex = i;
+          break;
+        }
+      }
+    }
 
     // Calculate the number of music that need to be recommended
     const totalMusicInQueue = currentQueue.length;
