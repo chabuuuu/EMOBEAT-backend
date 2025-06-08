@@ -5,9 +5,9 @@ import { injectable } from 'inversify';
 
 @injectable()
 export class TrackingService implements ITrackingService {
-  async trackMusicPlayed(musicId: number, listenerId: number): Promise<void> {
+  async trackMusicPlayed(mediaId: string, listenerId: number): Promise<void> {
     const MUSIC_PLAYED_DTO: MUSIC_PLAYED_DTO = {
-      musicId,
+      mediaId,
       listenerId
     };
     const message = JSON.stringify(MUSIC_PLAYED_DTO);

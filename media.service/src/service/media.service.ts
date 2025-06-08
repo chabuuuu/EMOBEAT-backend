@@ -17,6 +17,46 @@ export class MediaService implements IMediaService {
   private musicBucket = GlobalConfig.media_service.music_bucket.path;
   private minioEndpoint = process.env.MINIO_ENDPOINT || '';
   private serverUrl = GlobalConfig.server.url || '';
+  private SONATA_MAIN_SERVICE_URL = process.env.SONATA_MAIN_SERVICE_URL || '';
+
+  async getMediaId(): Promise<string> {
+    // Generate UUID for media ID
+    const { v4: uuidv4 } = await import('uuid');
+
+    return uuidv4();
+  }
+
+  async checkCanListenToQuality(listenerId: number, quality: string): Promise<boolean> {
+    const isPremiumUser = await this.checkIsPremiumUser(listenerId);
+    if (isPremiumUser) {
+      return true; // Premium users can listen to all qualities
+    }
+
+    // For non-premium users, check if the quality is allowed
+    const bitrates = ['128'];
+    if (bitrates.includes(quality)) {
+      return true; // Non-premium users can listen to 128kbps quality
+    }
+
+    return false; // Non-premium users cannot listen to other qualities
+  }
+
+  async checkIsPremiumUser(listenerId: number): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.SONATA_MAIN_SERVICE_URL}/listener/check-is-premium/${listenerId}`);
+      if (!response.ok) {
+        throw new Error('Failed to check premium status');
+      }
+      const data = await response.json();
+
+      console.log('Premium user status:', data.data.isPremium);
+
+      return data.data.isPremium;
+    } catch (error) {
+      console.error('Error checking premium user status:', error);
+      throw new BaseError('PREMIUM_CHECK_FAILED', 'Failed to check premium user status');
+    }
+  }
 
   private getResizeArgs(width?: number, height?: number, minWidth: number = 100, minHeight: number = 100): string[] {
     const args: string[] = [];
@@ -164,12 +204,7 @@ export class MediaService implements IMediaService {
     }
   }
 
-  async uploadMusic(
-    fileName: string,
-    mediaCategory: string,
-    tempFilePath: string,
-    musicId: number
-  ): Promise<MediaUploadRes> {
+  async uploadMusic(fileName: string, mediaCategory: string, tempFilePath: string, mediaId: string): Promise<void> {
     const bitrates = ['128', '320'];
 
     // Kiểm tra nếu file đã tồn tại ở bất kỳ chất lượng nào
@@ -200,8 +235,8 @@ export class MediaService implements IMediaService {
     // Xoá file gốc
     await fsPromises.unlink(tempFilePath);
 
-    return {
-      mediaUrl: `${this.serverUrl}/media/music?mediaCategory=${mediaCategory}&fileName=${fileName}`
-    };
+    // return {
+    //   mediaUrl: `${this.serverUrl}/media/music?mediaCategory=${mediaCategory}&fileName=${fileName}`
+    // };
   }
 }
