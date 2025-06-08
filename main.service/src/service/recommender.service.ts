@@ -1,5 +1,7 @@
 import { ErasAndStylesRes } from '@/dto/recommender/response/eras-and-styles.res';
 import { InstrumentSpotlightRes } from '@/dto/recommender/response/instrument-spotlight.res';
+import { ListenerEmotionEnum } from '@/enums/listener-emotion.enum';
+import { MusicEmotionEnum } from '@/enums/music-emotion.enum';
 import { RedisSchemaEnum } from '@/enums/redis-schema.enum';
 import { Album } from '@/models/album.model';
 import { Artist } from '@/models/artist.model';
@@ -120,7 +122,10 @@ export class RecommenderService implements IRecommenderService {
 
     // If the listener's emotion is exists, get songs by emotion
     if (listenerEmotion) {
-      const emotionSongs = await this.musicRepository.getSongsByEmotion(Number.parseInt(listenerEmotion), topN);
+      const emotionSongs = await this.getSongsByEmotion(
+        Number.parseInt(listenerEmotion),
+        topN - recommendedSongs.length
+      );
       recommendedSongs.push(...emotionSongs);
     }
 
@@ -137,6 +142,38 @@ export class RecommenderService implements IRecommenderService {
     recommendedSongs.push(...popularSongs);
 
     return recommendedSongs;
+  }
+  async getSongsByEmotion(listenerEmotion: number, topN: number): Promise<Music[]> {
+    // Mapping the listener's emotion to the music's emotion
+    const musicEmotion = [];
+
+    switch (listenerEmotion) {
+      case ListenerEmotionEnum.disgusted: // Happy
+        musicEmotion.push(MusicEmotionEnum.CHILL, MusicEmotionEnum.ROMANTIC, MusicEmotionEnum.OTHER); // Happy, Joyful, Energetic
+        break;
+      case ListenerEmotionEnum.fearful: // Sad
+        musicEmotion.push(MusicEmotionEnum.CHILL); // Using chill music for sad emotions to calm down
+        break;
+      case ListenerEmotionEnum.angry: // Angry
+        musicEmotion.push(MusicEmotionEnum.ENERGY); // Energetic to uplift mood
+        break;
+      case ListenerEmotionEnum.sad: // Sad
+        musicEmotion.push(MusicEmotionEnum.SAD, MusicEmotionEnum.CHILL); // Sad music to resonate with the emotion
+        break;
+      case ListenerEmotionEnum.happy: // Happy
+        musicEmotion.push(MusicEmotionEnum.HAPPY, MusicEmotionEnum.ENERGY, MusicEmotionEnum.ROMANTIC); // Default to happy emotions
+        break;
+      case ListenerEmotionEnum.neutral: // Neutral
+        musicEmotion.push(MusicEmotionEnum.OTHER, MusicEmotionEnum.CHILL, MusicEmotionEnum.ROMANTIC); // Neutral mood, use chill or other music
+        break;
+      case ListenerEmotionEnum.surprised: // Surprised
+        musicEmotion.push(MusicEmotionEnum.ENERGY, MusicEmotionEnum.HAPPY); // Energetic or happy music to match the surprise
+        break;
+      default:
+        break;
+    }
+
+    return await this.musicRepository.getSongsByEmotions(musicEmotion, topN);
   }
 
   async getPopularSongs(topN: number): Promise<Music[]> {

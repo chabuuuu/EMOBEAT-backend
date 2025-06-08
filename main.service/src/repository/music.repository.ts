@@ -14,15 +14,16 @@ export class MusicRepository extends BaseRepository<Music> implements IMusicRepo
     await this.ormRepository.increment({ id: musicId }, 'listenCount', 1);
   }
 
-  async getSongsByEmotion(listenerEmotion: number, topN: number): Promise<Music[]> {
+  async getSongsByEmotions(musicEmotions: number[], topN: number): Promise<Music[]> {
     return await this.ormRepository.find({
       where: {
-        emotion: listenerEmotion
+        emotion: In(musicEmotions)
       },
       order: {
         favoriteCount: 'DESC',
         listenCount: 'DESC'
-      }
+      },
+      take: topN
     });
   }
 
