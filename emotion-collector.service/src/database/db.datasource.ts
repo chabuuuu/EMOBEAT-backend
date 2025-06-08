@@ -1,9 +1,8 @@
 import 'dotenv/config';
-import { Account } from '../models/account.model';
-import { Role } from '../models/role.model';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { GlobalConfig } from '@/utils/config/global-config.util';
+import { EmotionCollect } from '@/models/emotion_collect.model';
 
 export class AppDataSourceSingleton {
   private static instance: DataSource;
@@ -19,7 +18,7 @@ export class AppDataSourceSingleton {
         username: process.env.DB_USERNAME || 'postgres',
         password: process.env.DB_PASSWORD || 'admin',
         database: process.env.DB_NAME || 'test',
-        entities: [Account, Role],
+        entities: [EmotionCollect],
         synchronize: GlobalConfig.database.sync,
         logging: true,
         migrations: [__dirname + '/migrations/*.js']
