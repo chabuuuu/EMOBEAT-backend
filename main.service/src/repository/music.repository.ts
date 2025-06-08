@@ -10,6 +10,21 @@ export class MusicRepository extends BaseRepository<Music> implements IMusicRepo
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(Music));
   }
+  async increaseListenCount(musicId: number): Promise<void> {
+    await this.ormRepository.increment({ id: musicId }, 'listenCount', 1);
+  }
+
+  async getSongsByEmotion(listenerEmotion: number, topN: number): Promise<Music[]> {
+    return await this.ormRepository.find({
+      where: {
+        emotion: listenerEmotion
+      },
+      order: {
+        favoriteCount: 'DESC',
+        listenCount: 'DESC'
+      }
+    });
+  }
 
   async findManyByIds(musicIds: number[]): Promise<Music[]> {
     return await this.ormRepository.find({

@@ -1,3 +1,3 @@
 export interface ITrackingService {
-  trackMusicPlayed(musicId: number, listenerId: number): Promise<void>;
+  trackMusicPlayed(mediaId: string, listenerId: number): Promise<void>;
 }

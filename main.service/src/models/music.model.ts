@@ -33,8 +33,11 @@ export class Music extends BaseModel {
   @Column({ name: 'resource_link' })
   resourceLink!: string;
 
-  @Column()
+  @Column({ nullable: true })
   releaseYear!: number;
+
+  @Column({ name: 'media_id', length: 250, nullable: true })
+  mediaId?: string;
 
   @ManyToMany(() => Album, (album) => album.musics)
   @JoinTable({

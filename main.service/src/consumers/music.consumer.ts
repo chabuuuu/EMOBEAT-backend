@@ -19,12 +19,12 @@ export class MusicConsumer {
       if (channel === 'MUSIC_PLAYED') {
         try {
           const payload: MUSIC_PLAYED_DTO = JSON.parse(message);
-          const { musicId, listenerId } = payload;
+          const { mediaId, listenerId } = payload;
           // Xử lý logic khi nhận sự kiện MUSIC_PLAYED
-          console.log('MUSIC_PLAYED event:', { musicId, listenerId });
+          console.log('MUSIC_PLAYED event:', { mediaId, listenerId });
 
           // Gọi service để xử lý tương tác
-          listenerMusicRecommendScoreService.interact(musicId, listenerId, InteractTypeEnum.LISTEN);
+          listenerMusicRecommendScoreService.interact(mediaId, listenerId, InteractTypeEnum.LISTEN);
         } catch (err) {
           console.error('Invalid MUSIC_PLAYED payload:', message);
         }

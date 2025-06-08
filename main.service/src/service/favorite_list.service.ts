@@ -92,8 +92,16 @@ export class FavoriteListService extends BaseCrudService<FavoriteList> implement
     // Update the music's favorite count
     this.musicRepository.increaseFavoriteCount(musicId);
 
-    // Update the listener's music recommendation score
-    this.listenerMusicRecommendScoreService.interact(musicId, listenerId, InteractTypeEnum.LIKE);
+    const music = await this.musicRepository.findOne({
+      filter: {
+        id: musicId
+      }
+    });
+
+    if (music && music.mediaId) {
+      // Update the listener's music recommendation score
+      this.listenerMusicRecommendScoreService.interact(music.mediaId, listenerId, InteractTypeEnum.LIKE);
+    }
   }
 
   async removeFromFavoriteList(musicId: number, listenerId: number): Promise<void> {

@@ -115,6 +115,15 @@ export class RecommenderService implements IRecommenderService {
       return recommendedSongs.slice(0, topN);
     }
 
+    // If do not have recommendation songs, get by current listener's emotion
+    const listenerEmotion = await redis.get(RedisSchemaEnum.emobeat_user_emotions + ':' + listenerId);
+
+    // If the listener's emotion is exists, get songs by emotion
+    if (listenerEmotion) {
+      const emotionSongs = await this.musicRepository.getSongsByEmotion(Number.parseInt(listenerEmotion), topN);
+      recommendedSongs.push(...emotionSongs);
+    }
+
     // If not enough recommendations, get more popular songs
     const remainingCount = topN - recommendedSongs.length;
 
