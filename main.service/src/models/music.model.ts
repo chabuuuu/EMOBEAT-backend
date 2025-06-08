@@ -96,6 +96,6 @@ export class Music extends BaseModel {
   @Column({ default: 0 })
   favoriteCount!: number;
 
-  @Column({ name: 'emotion', nullable: false, default: 0 })
+  @Column({ name: 'emotion', nullable: true, default: 0 })
   emotion!: number;
 }
