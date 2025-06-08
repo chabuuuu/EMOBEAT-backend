@@ -1,4 +1,4 @@
 export class MUSIC_PLAYED_DTO {
-  musicId!: number;
+  mediaId!: string;
   listenerId!: number;
 }

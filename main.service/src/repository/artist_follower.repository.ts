@@ -15,13 +15,13 @@ export class ArtistFollowerRepository
     super(dataSource.getRepository(ArtistFollower));
   }
 
-  async getTopArtistToday(topN: number): Promise<Artist[]> {
+  async getTopArtistToday(topN: number): Promise<number[]> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
 
-    return this.ormRepository
+    const artistFollowerQuery = this.ormRepository
       .createQueryBuilder('artist_followers')
       .innerJoinAndSelect('artist_followers.artist', 'artist')
       .where('artist_followers.createAt >= :today AND artist_followers.createAt < :tomorrow', { today, tomorrow })
@@ -31,7 +31,16 @@ export class ArtistFollowerRepository
       .groupBy('artist_followers.artistId')
       .addGroupBy('artist.name')
       .orderBy('COUNT(artist_followers.id)', 'DESC') // Sửa dòng này
-      .limit(topN)
-      .getRawMany();
+      .limit(topN);
+
+    const artistFollower = await artistFollowerQuery.getRawMany();
+
+    if (artistFollower.length === 0) {
+      // If no artist followers found, return an empty array
+      return [];
+    }
+
+    // Map the result to an array of artist IDs
+    return artistFollower.map((item) => item.artistId);
   }
 }
