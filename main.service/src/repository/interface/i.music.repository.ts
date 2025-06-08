@@ -3,7 +3,7 @@ import { IBaseRepository } from '@/repository/interface/i.base.repository';
 
 export interface IMusicRepository<T> extends IBaseRepository<T> {
   increaseListenCount(musicId: number): Promise<void>;
-  getSongsByEmotion(listenerEmotion: number, topN: number): Promise<Music[]>;
+  getSongsByEmotions(musicEmotions: number[], topN: number): Promise<Music[]>;
   getPopularSongsExclude(topN: number, excludeMusicIds: number[]): Promise<Music[]>;
   decreaseFavoriteCount(musicId: number): Promise<void>;
   increaseFavoriteCount(musicId: number): Promise<void>;
