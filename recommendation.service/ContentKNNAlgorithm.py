@@ -62,7 +62,6 @@ class ContentKNNAlgorithm(AlgoBase):
             'categories': 0.1,
             'periods': 0.1,
             'nationality': 0.05,
-            'contributor': 0.05
         }
 
         total_similarity = 0.0
@@ -109,11 +108,6 @@ class ContentKNNAlgorithm(AlgoBase):
         if nationality1 and nationality2 and nationality1 == nationality2:
             total_similarity += weights['nationality'] * 1.0
 
-        # 6. Tương đồng về NGƯỜI ĐÓNG GÓP (trùng khớp hoàn toàn)
-        contributor1 = details1.get('contributor_id')
-        contributor2 = details2.get('contributor_id')
-        if contributor1 and contributor2 and contributor1 == contributor2:
-            total_similarity += weights['contributor'] * 1.0
 
         return total_similarity
 
