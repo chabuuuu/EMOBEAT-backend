@@ -4,11 +4,20 @@ import { IArtistRepository } from '@/repository/interface/i.artist.repository';
 import { ITYPES } from '@/types/interface.types';
 import { inject } from 'inversify';
 import 'reflect-metadata';
-import { DataSource } from 'typeorm';
+import { DataSource, In, IsNull } from 'typeorm';
 
 export class ArtistRepository extends BaseRepository<Artist> implements IArtistRepository<Artist> {
   constructor(@inject(ITYPES.Datasource) dataSource: DataSource) {
     super(dataSource.getRepository(Artist));
+  }
+
+    async findManyByIds(artistsOfTheDayIds: number[]): Promise<Artist[]> {
+    return await this.ormRepository.find({
+      where: {
+        id: In(artistsOfTheDayIds),
+        deleteAt: IsNull()
+      }
+    });
   }
 
   async getRandomArtist(): Promise<Artist> {
