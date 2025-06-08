@@ -19,7 +19,7 @@
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check ./src",
     "prettier:fix": "prettier --write ./src",
-    "prepare": "cd .. && husky main/.husky",
+    "prepare": "husky .husky",
     "create:module": "ts-node ./src/utils/tools/auto-generate-module.ts",
     "create:service": "ts-node ./src/utils/tools/auto-generate-service.ts"
   },
