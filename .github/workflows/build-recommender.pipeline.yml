@@ -23,7 +23,7 @@ jobs:
 
       # Build Docker image and push to Docker Hub
       - name: Build Docker image
-        run: docker build -t $IMAGE_NAME .
+        run: docker build -t $IMAGE_NAME ./recommendation.service
 
       # Push Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
