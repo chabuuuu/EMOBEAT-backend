@@ -245,7 +245,7 @@ class MusicRecommendation:
         with self.redis_client.pipeline() as pipe:
             for emotion_id, recommendations in all_recommendations_by_emotion.items():
                 for listener_id, music_ids in recommendations:
-                    key = f"sonata_recommendations:listener:{listener_id}:emotion:{emotion_id}"
+                    key = f"emobeat_recommendations:listener:{listener_id}:emotion:{emotion_id}"
                     value = ",".join(map(str, music_ids))
                     pipe.set(key, value, ex=ttl_seconds)
             pipe.execute()
