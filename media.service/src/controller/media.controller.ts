@@ -101,12 +101,6 @@ export class MediaController {
         return;
       }
 
-      // Check if listner can listen to the requested quality
-      const canListenToQuality = await this.mediaService.checkCanListenToQuality(listener.id, quality);
-      if (!canListenToQuality) {
-        return res.send_forbidden('You do not have premium to listen to this quality.');
-      }
-
       const mediaId = fileName.split('_')[0];
 
       const range = req.headers.range;
