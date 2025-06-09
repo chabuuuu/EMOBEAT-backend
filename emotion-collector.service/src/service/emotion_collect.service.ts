@@ -66,6 +66,15 @@ export class EmotionCollectService
 
   async collect(emotionCollect: EmotionCollectReq): Promise<void> {
     let score = 0;
+
+    // For cron collect, we update the emotion of the user to redis
+    redis.set(
+      `${RedisSchemaEnum.emobeat_user_emotions}:${emotionCollect.userId}`,
+      emotionCollect.emotion,
+      'EX',
+      60 * 60 * 24
+    ); // 1 day
+
     switch (emotionCollect.event) {
       case EventEmotionCollectEnum.like:
         score = this.LIKE_SCORE;
@@ -83,13 +92,6 @@ export class EmotionCollectService
         score = this.PLAY_FULL_SCORE;
         break;
       case EventEmotionCollectEnum.cron_collect:
-        // For cron collect, we update the emotion of the user to redis
-        redis.set(
-          `${RedisSchemaEnum.emobeat_user_emotions}:${emotionCollect.userId}`,
-          emotionCollect.emotion,
-          'EX',
-          60 * 60 * 24
-        ); // 1 day
         return; // No score to collect for cron collect
 
       default:
