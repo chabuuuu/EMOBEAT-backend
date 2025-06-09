@@ -124,7 +124,8 @@ export class RecommenderService implements IRecommenderService {
     if (listenerEmotion) {
       const emotionSongs = await this.getSongsByEmotion(
         Number.parseInt(listenerEmotion),
-        topN - recommendedSongs.length
+        topN - recommendedSongs.length,
+        listenerId
       );
       recommendedSongs.push(...emotionSongs);
     }
@@ -143,9 +144,32 @@ export class RecommenderService implements IRecommenderService {
 
     return recommendedSongs;
   }
-  async getSongsByEmotion(listenerEmotion: number, topN: number): Promise<Music[]> {
+  async getSongsByEmotion(listenerEmotion: number, topN: number, listenerId: number): Promise<Music[]> {
+    const musics = [];
+
     // Mapping the listener's emotion to the music's emotion
     const musicEmotion = [];
+
+    // Try getting from Redis first (the recommend generate by recommender service)
+    const redisKey = `${RedisSchemaEnum.emobeat_recommendations}:listener:${listenerId}:emotion:${listenerEmotion}`;
+
+    console.log('Fetching recommendations from Redis with key:', redisKey);
+
+    const redisRecommendations = await redis.get(redisKey);
+
+    if (redisRecommendations && redisRecommendations.length > 0) {
+      // If we have recommendations from Redis, use them
+      const musicIds = redisRecommendations.split(',').map(Number);
+
+      // Filter out if musicIds length is more than topN
+      const limitedMusicIds = musicIds.slice(0, topN);
+
+      // Get the music objects from the music repository
+      const musicsRecommendeds = await this.musicRepository.findManyByIds(limitedMusicIds);
+      musics.push(...musicsRecommendeds);
+    }
+
+    topN = topN - musics.length;
 
     switch (listenerEmotion) {
       case ListenerEmotionEnum.disgusted: // Happy
@@ -173,7 +197,12 @@ export class RecommenderService implements IRecommenderService {
         break;
     }
 
-    return await this.musicRepository.getSongsByEmotions(musicEmotion, topN);
+    const musicFromDb = await this.musicRepository.getSongsByEmotions(musicEmotion, topN);
+    if (musicFromDb && musicFromDb.length > 0) {
+      musics.push(...musicFromDb);
+    }
+
+    return musics;
   }
 
   async getPopularSongs(topN: number): Promise<Music[]> {
