@@ -4,8 +4,8 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 export class EmotionCollectReq {
   @IsNotEmpty()
   userId!: number;
-  @IsNotEmpty()
-  musicId!: number;
+  @IsOptional()
+  musicId?: number;
   @IsNotEmpty()
   emotion!: number;
   @IsNotEmpty()
