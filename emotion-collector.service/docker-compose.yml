@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  emobeat-emotion-collector-service:
+    container_name: emobeat-emotion-collector-service
+    build:
+      context: .
+    restart: unless-stopped
+    ports:
+      - '8592:4000'
+    env_file:
+      - .env
+    deploy:
+      resources:
+        limits:
+          cpus: '0.40'
+          memory: 512M

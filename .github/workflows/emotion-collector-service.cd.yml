@@ -1,0 +1,46 @@
+name: "[CD Pipeline] for EMOBEAT Backend - Emotion Collector Service"
+
+env:
+  DEPLOY_FOLDER: /home/project/da2_project/backend/source/emotion-collector.service
+  PROJECT_FOLDER: /home/project/da2_project/backend/source
+  ENV_FILE_PATH: /home/project/da2_project/backend/env_file/emotion-collector.service/.env
+
+on:
+  push:
+    branches:
+      - release
+    paths:
+      - "emotion-collector.service/**"
+      - ".github/workflows/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Copy source code to server
+        uses: appleboy/scp-action@v0.1.1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          source: "./emotion-collector.service/"
+          target: ${{ env.PROJECT_FOLDER }}
+          strip_components: 1
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          script: |
+            cp ${{ env.ENV_FILE_PATH }} ${{ env.DEPLOY_FOLDER }}/.env
+            cd ${{ env.DEPLOY_FOLDER }}
+            sudo docker compose build  
+            sudo docker compose down     
+            sudo docker compose up -d
