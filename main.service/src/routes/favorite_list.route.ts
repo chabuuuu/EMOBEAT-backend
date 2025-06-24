@@ -7,6 +7,13 @@ const favoriteListRouter = express.Router();
 
 favoriteListRouter
 
+  .get(
+    '/check/:musicId',
+    authenticateJWT,
+    checkRole([RoleCodeEnum.LISTENER]),
+    favoriteListController.checkInFavoriteList.bind(favoriteListController)
+  )
+
   .delete(
     '/remove',
     authenticateJWT,

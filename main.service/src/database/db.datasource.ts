@@ -18,6 +18,7 @@ import { AlbumSubscriber } from '@/models/subcribers/album.subcriber';
 import { ArtistSubscriber } from '@/models/subcribers/artist.subcriber';
 import { CategorySubscriber } from '@/models/subcribers/category.subcriber';
 import { MusicSubscriber } from '@/models/subcribers/music.subcriber';
+import { UserSetting } from '@/models/user_setting.model';
 import { GlobalConfig } from '@/utils/config/global-config.util';
 import 'dotenv/config';
 import 'reflect-metadata';
@@ -39,7 +40,8 @@ const MODELS = [
   BaseModel,
   ListenerAlbumLike,
   ArtistFollower,
-  ListenerMusicRecommendScore
+  ListenerMusicRecommendScore,
+  UserSetting
 ];
 
 export class AppDataSourceSingleton {
