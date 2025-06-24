@@ -7,6 +7,7 @@ import { IBaseCrudService } from '@/service/interface/i.base.service';
 import { BaseModelType } from '@/types/base-model.types';
 
 export interface IFavoriteListService<T extends BaseModelType> extends IBaseCrudService<T> {
+  checkInFavoriteList(musicId: number, id: number): Promise<boolean>;
   addToFavoriteList(musicId: number, listenerId: number): Promise<void>;
   myFavoriteList(listenerId: number, searchData: SearchDataDto): Promise<PagingResponseDto<FavoriteList>>;
   removeFromFavoriteList(musicId: number, listenerId: number): Promise<void>;

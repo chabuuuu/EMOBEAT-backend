@@ -109,15 +109,9 @@ export class RecommenderService implements IRecommenderService {
   }
 
   async getRecommendedSongs(listenerId: number, topN: number): Promise<Music[]> {
-    // Get recommendations from Redis
-    const recommendedSongs = await this.getFromRecommdation(listenerId, topN, []);
+    const recommendedSongs = [];
 
-    // If have enough recommendations, return them
-    if (recommendedSongs.length >= topN) {
-      return recommendedSongs.slice(0, topN);
-    }
-
-    // If do not have recommendation songs, get by current listener's emotion
+    // Try get by current listener's emotion
     const listenerEmotion = await redis.get(RedisSchemaEnum.emobeat_user_emotions + ':' + listenerId);
 
     // If the listener's emotion is exists, get songs by emotion

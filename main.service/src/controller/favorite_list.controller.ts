@@ -68,4 +68,20 @@ export class FavoriteListController {
       next(error);
     }
   }
+
+  /**
+   * * * GET /favorite-list/check
+   */
+  async checkInFavoriteList(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { musicId } = req.params;
+      const listener = await getCurrentLoggedUser(req);
+
+      const isInFavoriteList = await this.favoriteListService.checkInFavoriteList(Number(musicId), listener.id);
+
+      res.send_ok('Check favorite list successfully', { isInFavoriteList });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

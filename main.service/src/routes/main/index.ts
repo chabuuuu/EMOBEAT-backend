@@ -15,6 +15,7 @@ import periodRouter from '@/routes/period.route';
 import recommenderRouter from '@/routes/recommender.route';
 import BaseError from '@/utils/error/base.error';
 import streamQueueRouter from '@/routes/stream_queue.route';
+import userSettingRouter from '@/routes/user_setting.route';
 
 export function route(app: any, root_api: string) {
   app.use(`${root_api}/admin`, adminRouter);
@@ -32,6 +33,7 @@ export function route(app: any, root_api: string) {
   app.use(`${root_api}/album-like`, listenerAlbumLikeRouter);
   app.use(`${root_api}/recommender`, recommenderRouter);
   app.use(`${root_api}/stream-queue`, streamQueueRouter);
+  app.use(`${root_api}/user-setting`, userSettingRouter);
 
   //Health check
   app.get(`${root_api}/health`, (req: any, res: any, next: any) => {

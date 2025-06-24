@@ -2,7 +2,7 @@ import { ArtistFollower } from '@/models/artist_follower.model';
 import { BaseModel } from '@/models/base/base.model';
 import { FavoriteList } from '@/models/favorite_list.model';
 import { ListenerAlbumLike } from '@/models/listener_album_like.model';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'listeners' })
 export class Listener extends BaseModel {
@@ -40,4 +40,7 @@ export class Listener extends BaseModel {
 
   @OneToMany(() => ListenerAlbumLike, (listenerAlbumLike) => listenerAlbumLike.listener)
   listenerAlbumLikes!: ListenerAlbumLike[];
+
+  @OneToOne(() => Listener, (listener) => listener.userSetting)
+  userSetting!: Listener;
 }

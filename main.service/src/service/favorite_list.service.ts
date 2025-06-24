@@ -31,6 +31,17 @@ export class FavoriteListService extends BaseCrudService<FavoriteList> implement
     this.listenerMusicRecommendScoreService = listenerMusicRecommendScoreService;
   }
 
+  async checkInFavoriteList(musicId: number, id: number): Promise<boolean> {
+    const favoriteList = await this.favoriteListRepository.findOne({
+      filter: {
+        musicId: musicId,
+        listenerId: id
+      }
+    });
+
+    return !!favoriteList;
+  }
+
   async myFavoriteList(listenerId: number, searchData: SearchDataDto): Promise<PagingResponseDto<FavoriteList>> {
     const { order, paging } = SearchUtil.getWhereCondition(searchData);
 
