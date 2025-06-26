@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  emabobeat-recommend:
+    image: haphuthinh/emobeat-detector:release-778b17505485c4a23c80cec906f0ee88364e85a7
+    ports:
+      - "5099:5000"
+    env_file:
+      - .env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
