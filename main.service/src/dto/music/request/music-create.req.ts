@@ -1,6 +1,4 @@
-import { QuizCreateInMusicCreateReq } from '@/dto/quiz/request/quiz-create-in-music-create.req';
-import { Type } from 'class-transformer';
-import { IsNotEmpty, IsOptional, MaxLength, ValidateNested } from 'class-validator';
+import { IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
 export class MusicCreateReq {
   @IsNotEmpty()
@@ -14,6 +12,9 @@ export class MusicCreateReq {
   lyric!: string;
 
   @IsOptional()
+  mediaId?: string;
+
+  @IsOptional()
   coverPhoto!: string;
 
   @IsNotEmpty()
@@ -21,11 +22,6 @@ export class MusicCreateReq {
 
   @IsOptional()
   albumIds!: number[];
-
-  @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => QuizCreateInMusicCreateReq)
-  quizzes!: QuizCreateInMusicCreateReq[];
 
   @IsOptional()
   genreIds!: number[];
