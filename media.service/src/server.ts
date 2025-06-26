@@ -26,7 +26,11 @@ app.use(express.json());
 app.use(morgan(GlobalConfig.morgan.format || 'dev'));
 app.use(cors(GlobalConfig.cors));
 if (GlobalConfig.helmet.enable) {
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: true
+    })
+  );
 }
 app.use(responseFormater);
 
