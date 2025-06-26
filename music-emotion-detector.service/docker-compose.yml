@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   emabobeat-recommend:
-    image: haphuthinh/emobeat-detector:release-778b17505485c4a23c80cec906f0ee88364e85a7
+    image: haphuthinh/emobeat-detector:release-ce2da672cea1b77fe6fc318a09b26433a7dbff95
     ports:
       - "5099:5000"
     env_file:
