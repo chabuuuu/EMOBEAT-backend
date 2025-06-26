@@ -13,6 +13,8 @@ mediaRouter
 
   .get('/music', authenticateJWT, mediaController.getMusic.bind(mediaController))
 
-  .get('/image', mediaController.getImage.bind(mediaController));
+  .get('/image', mediaController.getImage.bind(mediaController))
+
+  .get('/media-id', mediaController.getMediaId.bind(mediaController));
 
 export default mediaRouter;
