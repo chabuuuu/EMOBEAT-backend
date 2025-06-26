@@ -51,6 +51,15 @@ for emotion_id, emotion_name in emotion_map.items():
             print(f"No rating data found for emotion '{emotion_name}'. Skipping.")
             continue
 
+        print("Filtering users relevant to this emotion...")
+        users_for_this_emotion = list(set(uid for (uid, _, _, _) in evaluation_data_for_emotion.raw_ratings))
+        print(f"Found {len(users_for_this_emotion)} users with ratings for '{emotion_name}'.")
+
+        # Nếu không có user nào cho cảm xúc này, bỏ qua để tránh lỗi
+        if not users_for_this_emotion:
+            print(f"User list for '{emotion_name}' is empty. Skipping recommendation generation.")
+            continue
+
         # Lấy bảng xếp hạng độ phổ biến cho cảm xúc này
         rankings_for_emotion = musicData.getPopularityRanks(emotion=emotion_id)
 
@@ -69,7 +78,7 @@ for emotion_id, emotion_name in emotion_map.items():
 
         # Tạo gợi ý cho tất cả người dùng với cảm xúc hiện tại
         print(f"Generating recommendations for all users based on '{emotion_name}' mood...")
-        recommendations_for_emotion = evaluator.RecommendForEachUser(musicData, all_users)
+        recommendations_for_emotion = evaluator.RecommendForEachUser(musicData, users_for_this_emotion)
         print(f"Generated recommendations for {len(recommendations_for_emotion)} users.")
 
         # Lưu kết quả gợi ý của cảm xúc này vào dictionary chung
