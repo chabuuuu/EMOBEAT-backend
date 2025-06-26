@@ -145,7 +145,6 @@ def process_music_emotions():
         for song_id, resource_link in songs_to_process:
             object_name = None
             
-            # <<< THAY ĐỔI: Phân tích resource_link để lấy object_name >>>
             try:
                 parsed_url = urlparse(resource_link)
                 query_params = parse_qs(parsed_url.query)
@@ -162,7 +161,6 @@ def process_music_emotions():
             except (ValueError, KeyError, IndexError) as e:
                 print(f"  -> LỖI: Không thể phân tích object name từ resource_link: '{resource_link}'. Lỗi: {e}. Bỏ qua bài hát này.")
                 continue # Bỏ qua và xử lý bài hát tiếp theo
-            # <<< KẾT THÚC THAY ĐỔI >>>
 
 
             print(f"\nĐang xử lý bài hát ID: {song_id}, Object Name: {object_name}")
