@@ -10,4 +10,4 @@ WORKDIR /app
 COPY --from=builder /opt/conda /opt/conda
 ENV PATH=/opt/conda/bin:$PATH
 COPY . .
-CMD ["conda", "run", "--no-capture-output", "-n", "EmobeatDetect", "python", "main.py"]
+CMD ["conda", "run", "--no-capture-output", "-n", "MusicEmotionDetect", "python", "main.py"]
