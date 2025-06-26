@@ -131,7 +131,7 @@ def process_music_emotions():
 
         # 1. Lấy danh sách bài hát chưa có nhãn cảm xúc
         # media_id được giả định là object_name trong MinIO
-        query_fetch = "SELECT id, resource_link FROM mucis WHERE emotion IS NULL AND resource_link IS NOT NULL"
+        query_fetch = "SELECT id, resource_link FROM mucis WHERE emotion = 0 AND resource_link IS NOT NULL"
         cursor.execute(query_fetch)
         songs_to_process = cursor.fetchall()
 
