@@ -28,7 +28,7 @@ app.use(cors(GlobalConfig.cors));
 if (GlobalConfig.helmet.enable) {
   app.use(
     helmet({
-      crossOriginResourcePolicy: true
+      crossOriginResourcePolicy: false
     })
   );
 }
