@@ -139,6 +139,7 @@ export class MusicService extends BaseCrudService<Music> implements IMusicServic
     music.lyric = req.lyric;
     music.coverPhoto = req.coverPhoto;
     music.resourceLink = req.resourceLink;
+    music.mediaId = req.mediaId;
 
     return music;
   }
